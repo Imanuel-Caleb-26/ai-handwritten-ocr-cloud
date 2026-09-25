@@ -1,0 +1,11 @@
+# Core web app
+flask
+Pillow
+
+# Document export
+python-docx
+fpdf2
+
+# API APIs
+google-generativeai
+requests

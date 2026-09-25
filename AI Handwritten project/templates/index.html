@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Cambio | AI Handwritten Recognition</title>
+    <meta name="description" content="Convert any handwritten text to digital files instantly using AI-powered OCR.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="bg-orbs" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="32" height="32" rx="8" fill="url(#logo-grad)"/>
+                    <path d="M8 22 Q10 14 14 16 Q18 18 20 10" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                    <defs>
+                        <linearGradient id="logo-grad" x1="0" y1="0" x2="32" y2="32">
+                            <stop offset="0%" stop-color="#6366F1"/>
+                            <stop offset="100%" stop-color="#8B5CF6"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>El Cambio<span class="dot">.</span></span>
+            </div>
+        </header>
+
+        <main>
+            <section class="hero">
+                <h1>Handwriting<br><span class="gradient-text">to Digital Text</span></h1>
+                <p class="hero-sub">Upload any handwritten image — notes, letters, manuscripts — and get accurate digital text in seconds.</p>
+            </section>
+
+            <!-- Upload zone -->
+            <div class="card upload-card" id="drop-zone" role="button" tabindex="0" aria-label="Upload handwriting image">
+                <input type="file" id="file-input" accept="image/*" hidden>
+                <div class="upload-content" id="upload-content">
+                    <div class="upload-icon-wrap">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <p class="upload-hint">Drag &amp; drop your handwriting image here</p>
+                    <span class="upload-or">or</span>
+                    <button class="btn btn-outline" id="browse-btn" type="button">Browse file</button>
+                    <p class="upload-formats">PNG, JPG, BMP, TIFF, WEBP</p>
+                </div>
+            </div>
+
+            <!-- Result section (hidden until scan) -->
+            <div class="result-section hidden" id="result-section">
+                <div class="preview-grid">
+                    <div class="card preview-card">
+                        <h3>Image Preview</h3>
+                        <div class="image-container">
+                            <img id="image-preview" src="" alt="Uploaded handwriting">
+                        </div>
+                    </div>
+
+                    <div class="card text-card">
+                        <div class="card-header">
+                            <h3>Recognized Text</h3>
+                            <div class="header-actions">
+                                <div class="status" id="ocr-status">Processing…</div>
+                                <button class="btn-icon" id="btn-copy" title="Copy to clipboard" disabled>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Progress bar -->
+                        <div class="progress-wrap" id="progress-wrap">
+                            <div class="progress-bar" id="progress-bar"></div>
+                            <span class="progress-label" id="progress-label">Scanning…</span>
+                        </div>
+
+                        <textarea id="output-text" placeholder="Recognized text will appear here…" spellcheck="true"></textarea>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" id="btn-docx" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        Download Word
+                    </button>
+                    <button class="btn btn-secondary" id="btn-pdf" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        Download PDF
+                    </button>
+                    <button class="btn btn-ghost" id="btn-reset" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                            <path d="M3 3v5h5"/>
+                        </svg>
+                        Scan Another
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 AI Handwritten project &bull; Powered by TrOCR &amp; Flask</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

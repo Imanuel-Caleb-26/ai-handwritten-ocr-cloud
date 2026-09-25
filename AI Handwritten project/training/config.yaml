@@ -1,0 +1,37 @@
+# TrOCR Fine-Tuning Hyperparameters
+# Training on IAM Handwriting Database
+
+model:
+  base: "microsoft/trocr-large-handwritten"
+  output_dir: "models/trocr-iam-finetuned"
+
+dataset:
+  name: "Teklia/IAM-line"      # HuggingFace IAM lines dataset (no auth needed)
+  train_split: "train"
+  validation_split: "validation"
+  test_split: "test"
+  max_train_samples: null      # null = use all; set integer to limit (e.g. 1000 for quick test)
+  max_val_samples: 200
+
+training:
+  num_epochs: 3                # increase for better accuracy (5-10 recommended)
+  batch_size: 4                # reduce to 2 if OOM on CPU
+  learning_rate: 5.0e-5
+  weight_decay: 0.01
+  warmup_steps: 100
+  save_steps: 500
+  eval_steps: 500
+  logging_steps: 50
+  fp16: false                  # set true only with CUDA GPU
+  gradient_accumulation_steps: 4  # effective batch = batch_size * grad_accum
+  max_grad_norm: 1.0
+  dataloader_num_workers: 0    # 0 = no multiprocessing (safe on Windows)
+
+image:
+  height: 384
+  max_width: 2500
+
+generation:
+  max_new_tokens: 128
+  num_beams: 5
+  early_stopping: true

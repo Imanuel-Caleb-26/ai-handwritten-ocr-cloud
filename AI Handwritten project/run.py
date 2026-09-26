@@ -32,7 +32,7 @@ if __name__ == "__main__":
         info = engine.model_info()
         print(f"  Model loaded:  [{info['label']}]  on {info['device'].upper()}")
     except Exception as e:
-        print(f"\n  ✗ CRITICAL ERROR during model load: {e}")
+        print(f"\n  [!] CRITICAL ERROR during model load: {e}")
         sys.exit(1)
 
     print("\n  Server is LIVE at: http://127.0.0.1:5000")

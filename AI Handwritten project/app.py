@@ -74,7 +74,7 @@ def upload():
         engine = get_engine(model_type)
         text = engine.recognize_text(img_path)
 
-        if not text.strip():
+        if text is None or not text.strip():
             text = "[No text detected — try a clearer image or higher contrast]"
 
         text_cache[file_id] = text

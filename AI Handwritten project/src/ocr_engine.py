@@ -68,16 +68,37 @@ class OCRSpaceEngine:
         return parsed_results[0].get("ParsedText", "").strip()
 
 
-class PipelineEngine:
+class EasyOCREngine:
     def __init__(self):
-        self.gemini = GeminiEngine()
-        self.ocrspace = OCRSpaceEngine()
+        import easyocr
+        self.reader = easyocr.Reader(['en'], gpu=False)
 
     def model_info(self) -> dict:
         return {
             "is_finetuned": False,
-            "device": "cloud",
-            "label": "Pipeline (Gemini -> OCR Space)",
+            "device": "local",
+            "label": "EasyOCR",
+        }
+
+    def recognize_text(self, image_path: str) -> str:
+        print(f"Processing (EasyOCR): {image_path}")
+        results = self.reader.readtext(image_path)
+        results_sorted = sorted(results, key=lambda item: item[0][0][1])
+        text_lines = [text for bbox, text, prob in results_sorted]
+        return "\n".join(text_lines)
+
+
+class PipelineEngine:
+    def __init__(self):
+        self.gemini = GeminiEngine()
+        self.ocrspace = OCRSpaceEngine()
+        self.easyocr = EasyOCREngine()
+
+    def model_info(self) -> dict:
+        return {
+            "is_finetuned": False,
+            "device": "hybrid",
+            "label": "Pipeline (Gemini -> OCR Space -> EasyOCR)",
         }
 
     def recognize_text(self, image_path: str) -> str:
@@ -96,7 +117,15 @@ class PipelineEngine:
                 return text
         except Exception as e:
             print(f"Pipeline: OCR Space failed - {e}")
-            raise Exception("All cloud OCR models failed.")
+
+        try:
+            print("Pipeline: Trying EasyOCR (Local)...")
+            text = self.easyocr.recognize_text(image_path)
+            if text:
+                return text
+        except Exception as e:
+            print(f"Pipeline: EasyOCR failed - {e}")
+            raise Exception("All OCR models (Cloud & Local) failed.")
 
 
 # ─── Singleton ────────────────────────────────────────────────────────────────
@@ -109,6 +138,8 @@ def get_engine(model_type: str = "pipeline"):
             _engines[model_type] = GeminiEngine()
         elif model_type == "ocrspace":
             _engines[model_type] = OCRSpaceEngine()
+        elif model_type == "easyocr":
+            _engines[model_type] = EasyOCREngine()
         else:
             _engines[model_type] = PipelineEngine()
     return _engines[model_type]

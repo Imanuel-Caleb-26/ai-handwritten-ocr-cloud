@@ -9,3 +9,4 @@ fpdf2
 # API APIs
 google-generativeai
 requests
+easyocr
